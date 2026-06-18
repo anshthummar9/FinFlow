@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FinFlow</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Top Bar / Navbar -->
+        <div class="top-bar">
+            <h1>
+                <i data-lucide="wallet" style="width: 28px; height: 28px; color: var(--primary-color);"></i>
+                FinFlow
+            </h1>
+            <div class="user-profile">
+                <div class="welcome-user">
+                    Hello, <span id="userName">User</span>
+                </div>
+                <button class="logout-button" id="logoutBtn">
+                    <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="kpi-container">
+            <div class="card kpi-card balance-card">
+                <div class="kpi-header">
+                    <span>Total Balance</span>
+                    <div class="kpi-icon-container">
+                        <i data-lucide="scale" style="width: 18px; height: 18px;"></i>
+                    </div>
+                </div>
+                <p class="kpi-value" id="balance">₹0.00</p>
+            </div>
+            
+            <div class="card kpi-card income-card">
+                <div class="kpi-header">
+                    <span>Income</span>
+                    <div class="kpi-icon-container">
+                        <i data-lucide="arrow-up-right" style="width: 18px; height: 18px;"></i>
+                    </div>
+                </div>
+                <p class="kpi-value" id="income">₹0.00</p>
+            </div>
+            
+            <div class="card kpi-card expense-card">
+                <div class="kpi-header">
+                    <span>Expenses</span>
+                    <div class="kpi-icon-container">
+                        <i data-lucide="arrow-down-left" style="width: 18px; height: 18px;"></i>
+                    </div>
+                </div>
+                <p class="kpi-value" id="expense">₹0.00</p>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Content Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column: Add Transaction & Chart -->
+            <div class="dashboard-sidebar">
+                <div class="card">
+                    <div class="card-title">
+                        <i data-lucide="plus-circle" style="width: 20px; height: 20px; color: var(--primary-color);"></i>
+                        Add Transaction
+                    </div>
+                    
+                    <!-- Transaction Type Tabs -->
+                    <div class="transaction-type-tabs" id="typeTabs">
+                        <button type="button" class="tab-btn active" data-type="expense" id="tabExpense">
+                            <i data-lucide="arrow-down-left" style="width: 16px; height: 16px;"></i>
+                            Expense
+                        </button>
+                        <button type="button" class="tab-btn" data-type="income" id="tabIncome">
+                            <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                            Income
+                        </button>
+                    </div>
+
+                    <div class="form">
+                        <div class="form-control">
+                            <label for="text">Description</label>
+                            <input type="text" id="text" placeholder="Enter description...">
+                        </div>
+                        <div class="form-control">
+                            <label for="amount">Amount</label>
+                            <input type="number" id="amount" placeholder="Enter amount..." min="0.01" step="0.01">
+                        </div>
+                        <button class="btn" id="add-transaction">
+                            <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+                            Add Transaction
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Analytics Card -->
+                <div class="card analytics-card">
+                    <div class="card-title">
+                        <i data-lucide="pie-chart" style="width: 20px; height: 20px; color: var(--primary-color);"></i>
+                        Breakdown Analytics
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="analyticsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: History -->
+            <div class="dashboard-main">
+                <div class="card">
+                    <div class="card-title">
+                        <i data-lucide="history" style="width: 20px; height: 20px; color: var(--primary-color);"></i>
+                        Transaction History
+                    </div>
+
+                    <!-- Search and Filter Controls -->
+                    <div class="history-controls">
+                        <div class="search-container">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="searchInput" placeholder="Search transactions...">
+                        </div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" data-filter="all" id="filterAll">All</button>
+                            <button class="filter-btn" data-filter="income" id="filterIncome">Income</button>
+                            <button class="filter-btn" data-filter="expense" id="filterExpense">Expense</button>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Transaction List -->
+                    <div class="transaction-list" id="list">
+                        <!-- Items dynamically generated by script.js -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

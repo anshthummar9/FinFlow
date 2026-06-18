@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - FinFlow</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Login</h1>
+        <p>Access your expense dashboard</p>
+      </div>
+      <form class="form" id="login-form">
+        <div class="form-control">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+        </div>
+        <div class="form-control">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn" id="login-btn">
+          <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+          Login
+        </button>
+        <a href="register.html" class="auth-link">Don't have an account? Register</a>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      let iconName = 'info';
+      if (type === 'success') iconName = 'check-circle';
+      if (type === 'error') iconName = 'alert-triangle';
+      
+      toast.innerHTML = `
+        <div class="toast-icon">
+          <i data-lucide="${iconName}"></i>
+        </div>
+        <div class="toast-message">${message}</div>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      // Remove toast after animation completes
+      setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 4700);
+    }
+
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      window.location.href = "expense_tracker.html";
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!username || !password) {
+        showToast('Please enter both username and password.', 'error');
+        return;
+      }
+
+      const user = { username, password };
+
+      try {
+        const response = await fetch("http://localhost:8080/ExpTrack/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(user)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          showToast(errorData.message || 'Login failed', 'error');
+          return;
+        }
+
+        const data = await response.json();
+        localStorage.setItem("user", data.username);
+        showToast('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = "expense_tracker.html";
+        }, 1000);
+
+      }
+      catch (error) {
+        showToast("Request failed: " + error.message, 'error');
+      }
+    });
+  </script>
+</body>
+
+</html>

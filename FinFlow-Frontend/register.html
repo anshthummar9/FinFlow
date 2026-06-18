@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - FinFlow</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Register</h1>
+        <p>Create your account to start tracking</p>
+      </div>
+      <form class="form" id="register-form">
+        <div class="form-control">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Choose a username" autocomplete="username">
+        </div>
+        <div class="form-control">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" autocomplete="email">
+        </div>
+        <div class="form-control">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Create a password" autocomplete="new-password">
+        </div>
+        <div class="form-control">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" placeholder="Confirm your password" autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn" id="register-btn">
+          <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+          Register
+        </button>
+        <a href="login.html" class="auth-link">Already have an account? Login</a>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      let iconName = 'info';
+      if (type === 'success') iconName = 'check-circle';
+      if (type === 'error') iconName = 'alert-triangle';
+      
+      toast.innerHTML = `
+        <div class="toast-icon">
+          <i data-lucide="${iconName}"></i>
+        </div>
+        <div class="toast-message">${message}</div>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 4700);
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+      if (!username || !email || !password || !confirmPassword) {
+        showToast('Please fill in all fields.', 'error');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match.', 'error');
+        return;
+      }
+
+      const user = { username, email, password };
+
+      try {
+        const response = await fetch("http://localhost:8080/ExpTrack/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(user)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          showToast("Error: " + (errorData.message || 'Registration failed'), 'error');
+          return;
+        }
+
+        const data = await response.json();
+        showToast("Registration successful for: " + data.username + "! Redirecting...", 'success');
+        
+        document.getElementById("register-form").reset();
+        
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+
+      } catch (error) {
+        showToast("Request failed: " + error.message, 'error');
+      }
+    });
+  </script>
+</body>
+
+</html>
