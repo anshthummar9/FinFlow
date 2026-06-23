@@ -72,4 +72,19 @@ public class TransactionServiceImpl implements TransactionService {
             throw new RuntimeException("Transaction not found or does not belong to the user: " + username);
         }
     }
+
+    @Override
+    public Transaction updateTransaction(Long id, String username, Transaction transactionDetails) {
+        Transaction transaction = transactionRepository.findByIdAndUserUsername(id, username);
+        if (transaction != null) {
+            transaction.setText(transactionDetails.getText());
+            transaction.setAmount(transactionDetails.getAmount());
+            if (transactionDetails.getDate() != null) {
+                transaction.setDate(transactionDetails.getDate());
+            }
+            return transactionRepository.save(transaction);
+        } else {
+            throw new RuntimeException("Transaction not found or does not belong to the user: " + username);
+        }
+    }
 }

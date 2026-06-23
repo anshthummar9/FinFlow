@@ -11,4 +11,5 @@ public interface TransactionService {
     void deleteTransaction(Long id, String username);
     void permanentlyDeleteTransaction(Long id, String username);
     Transaction restoreTransaction(Long id, String username);
+    Transaction updateTransaction(Long id, String username, Transaction transactionDetails);
 }

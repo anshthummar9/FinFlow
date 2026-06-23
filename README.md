@@ -12,16 +12,19 @@ Users can register, log in, add transactions (income and expenses), and view dyn
 
 ## Key Features
 
-### 👤 User Authentication
+### 👤 User Authentication & Session Management
 - Register and login securely.
 - Client-side and server-side validation for credentials.
 - Handles error notifications gracefully via interactive toast alerts (e.g., username/email already exists, wrong password).
+- **Session Auto-Timeout:** Automatic logout after 15 minutes of inactivity to keep financial data secure.
+- **Multi-Tab Syncing:** Synchronizes authentication state and activity updates across all active browser tabs.
 
 ### ⚙️ Backend (Spring Boot)
 - RESTful APIs for user registration, login, and transaction management under `/ExpTrack`.
 - Structured layered architecture: Controller, Service (Interface & Implementation), Repository, and Entity layers.
 - Centralized error handling via `GlobalExceptionHandler` to translate validation and persistence exceptions into unified JSON responses.
 - Database persistence via **Spring Data JPA** targeting a MySQL database.
+- **Soft Delete Support:** Dedicated API endpoints to support moving transactions to trash, restoring them, or permanently purging them.
 
 ### 🎨 Frontend (HTML / CSS / JS)
 - Modern and responsive dashboard styling using a premium dark-themed color palette, smooth animations, card layouts, and responsive grids.
@@ -29,6 +32,7 @@ Users can register, log in, add transactions (income and expenses), and view dyn
 - Visual breakdowns using dynamic **Chart.js** charts.
 - Search and filter controls (All, Income, Expenses) to scan through transaction logs effortlessly.
 - Input validation (e.g., restricted numeric entries for transaction amounts).
+- **Interactive Trash Bin:** Clean, top-aligned overlay modal that slides down on open, allowing users to search, restore, or permanently delete soft-deleted transactions.
 
 ---
 
@@ -79,4 +83,4 @@ The backend will start and listen on `http://localhost:8080` by default.
 ### 4. Open the Frontend
 Since the frontend comprises static HTML pages, no Node server is required:
 1. Open the [FinFlow-Frontend](FinFlow-Frontend) folder.
-2. Double-click [login.html](FinFlow-Frontend/login.html) to open it in your browser (or use a VS Code extension like **Live Server** to run it).
+2. Double-click [index.html](FinFlow-Frontend/index.html) to open it in your browser (or use a VS Code extension like **Live Server** to run it).

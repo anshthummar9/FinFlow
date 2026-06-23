@@ -11,6 +11,16 @@
 </head>
 
 <body>
+  <!-- Navigation Bar -->
+  <header class="landing-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo" style="text-decoration: none;">
+        <i data-lucide="wallet" class="logo-icon"></i>
+        <span>FinFlow</span>
+      </a>
+    </div>
+  </header>
+
   <div class="auth-page">
     <div class="auth-container">
       <div class="auth-header">
@@ -38,10 +48,19 @@
           <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
           Register
         </button>
-        <a href="login.html" class="auth-link">Already have an account? Login</a>
+        <a href="login.html?ref=landing" class="auth-link">Already have an account? Login</a>
       </form>
     </div>
   </div>
+
+  <!-- Footer Section -->
+  <footer class="landing-footer" style="--footer-max-width: 400px;">
+    <div class="footer-container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 FinFlow Expense Tracker. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
   <div class="toast-container" id="toast-container"></div>
 
@@ -71,6 +90,16 @@
         toast.style.animation = 'fadeOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
         setTimeout(() => toast.remove(), 300);
       }, 4700);
+    }
+
+    const storedUser = localStorage.getItem("user");
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+
+    if (storedUser) {
+      window.location.href = "expense_tracker.html";
+    } else if (ref !== 'landing') {
+      window.location.href = "index.html";
     }
 
     document.getElementById('register-form').addEventListener('submit', async (event) => {
@@ -113,7 +142,7 @@
         document.getElementById("register-form").reset();
         
         setTimeout(() => {
-          window.location.href = 'login.html';
+          window.location.href = 'login.html?ref=landing';
         }, 1500);
 
       } catch (error) {

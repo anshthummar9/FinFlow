@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History & Analytics - FinFlow</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container" style="max-width: 1200px; padding: 30px 20px;">
+        <!-- Header Bar -->
+        <div class="top-bar">
+            <h1>
+                <i data-lucide="wallet" style="width: 28px; height: 28px; color: var(--primary-color);"></i>
+                FinFlow
+            </h1>
+            <div class="user-profile">
+                <button class="filter-btn" id="closeBtn" title="Back to Dashboard" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); border-radius: 8px; color: var(--text-primary); cursor: pointer; height: 38px;">
+                    <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                    Back to Dashboard
+                </button>
+            </div>
+        </div>
+
+        <div class="history-grid">
+            <!-- Left Side: History List & Controls -->
+            <div class="card" style="display: flex; flex-direction: column; gap: 20px; min-height: 500px;">
+                <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="list" style="width: 20px; height: 20px; color: var(--primary-color);"></i>
+                        Transactions List
+                    </div>
+                    <span id="modalTransactionCount" style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">0 transactions</span>
+                </div>
+
+                <div class="history-controls" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; flex-direction: row; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                    <div class="search-container" style="flex: 1; min-width: 200px;">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="modalHistSearchInput" placeholder="Search transactions...">
+                    </div>
+                    <div class="advanced-filter-container" style="position: relative;">
+                        <button class="filter-btn" id="modalHistFilterDropdownBtn" style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); border-radius: 8px; height: 42px; cursor: pointer;">
+                            <i data-lucide="sliders-horizontal" style="width: 14px; height: 14px;"></i>
+                            Filters
+                        </button>
+                        <div class="dropdown-menu" id="modalHistFilterDropdown" style="min-width: 260px; padding: 16px; right: 0; display: none; position: absolute; top: 48px; background: rgba(20, 26, 40, 0.98); border: 1px solid var(--border-color); border-radius: 12px; z-index: 1000; box-shadow: var(--shadow-lg);">
+                            <div class="filter-section" style="margin-bottom: 12px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Transaction Type</label>
+                                <select id="modalHistTypeFilterSelect" style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(10,15,26,0.85); border: 1px solid var(--border-color); color: var(--text-primary); font-family: var(--font-family); font-size: 13px; outline: none;">
+                                    <option value="all">All</option>
+                                    <option value="income">Income</option>
+                                    <option value="expense">Expense</option>
+                                </select>
+                            </div>
+                            <div class="filter-section" style="margin-bottom: 12px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Date Range</label>
+                                <select id="modalHistDateFilterSelect" style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(10,15,26,0.85); border: 1px solid var(--border-color); color: var(--text-primary); font-family: var(--font-family); font-size: 13px; outline: none;">
+                                    <option value="all">All Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="yesterday">Yesterday</option>
+                                    <option value="last7">Last 7 Days</option>
+                                    <option value="last30">Last 30 Days</option>
+                                    <option value="thisMonth">This Month</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                            </div>
+                            <div id="modalHistCustomDateContainer" style="display: none; margin-bottom: 12px; gap: 8px; grid-template-columns: 1fr 1fr;">
+                                <div>
+                                    <label style="display: block; font-size: 9px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Start</label>
+                                    <input type="date" id="modalHistStartDateInput" style="width: 100%; padding: 6px; border-radius: 6px; background: rgba(10,15,26,0.85); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 9px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">End</label>
+                                    <input type="date" id="modalHistEndDateInput" style="width: 100%; padding: 6px; border-radius: 6px; background: rgba(10,15,26,0.85); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11px;">
+                                </div>
+                            </div>
+                            <div class="filter-section" style="margin-bottom: 12px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Sort By</label>
+                                <select id="modalHistSortFilterSelect" style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(10,15,26,0.85); border: 1px solid var(--border-color); color: var(--text-primary); font-family: var(--font-family); font-size: 13px; outline: none;">
+                                    <option value="dateDesc">Date: Newest First</option>
+                                    <option value="dateAsc">Date: Oldest First</option>
+                                    <option value="amountDesc">Amount: High to Low</option>
+                                    <option value="amountAsc">Amount: Low to High</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-top: 16px;">
+                                <button id="modalHistResetFiltersBtn" class="filter-btn" style="flex: 1; border: 1px solid rgba(255,255,255,0.1); padding: 6px; cursor: pointer;">Reset</button>
+                                <button id="modalHistApplyFiltersBtn" class="filter-btn" style="flex: 1; background: var(--primary-color); color: white; font-weight: 600; padding: 6px; cursor: pointer;">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transaction-list" id="modalHistList" style="max-height: 550px; overflow-y: auto; padding-right: 5px;">
+                    <!-- Dynamically filled by history.js -->
+                </div>
+            </div>
+
+            <!-- Right Side: Analytics Charts -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div class="card" style="padding: 20px;">
+                    <div class="card-title" style="font-size: 14px; margin-bottom: 16px;">
+                        <i data-lucide="pie-chart" style="width: 18px; height: 18px; color: var(--primary-color);"></i>
+                        Breakdown Analysis
+                    </div>
+                    <div style="position: relative; height: 220px;">
+                        <canvas id="modalHistChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 20px;">
+                    <div class="card-title" style="font-size: 14px; margin-bottom: 16px;">
+                        <i data-lucide="trending-up" style="width: 18px; height: 18px; color: var(--primary-color);"></i>
+                        Daily Trend Analysis
+                    </div>
+                    <div style="position: relative; height: 220px;">
+                        <canvas id="modalHistTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="landing-footer" style="--footer-max-width: 1200px;">
+        <div class="footer-container">
+            <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+                <p>&copy; 2026 FinFlow Expense Tracker. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Edit Modal (contained inside the history window) -->
+    <div class="modal" id="editModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h2>
+                    <i data-lucide="edit-3" style="color: var(--primary-color); width: 22px; height: 22px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>Edit Transaction
+                </h2>
+                <button class="close-modal-btn" id="closeEditModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form" id="edit-form">
+                    <div class="transaction-type-tabs" id="editTypeTabs">
+                        <button type="button" class="tab-btn active" data-type="expense" id="editTabExpense">
+                            <i data-lucide="arrow-down-left" style="width: 16px; height: 16px;"></i>
+                            Expense
+                        </button>
+                        <button type="button" class="tab-btn" data-type="income" id="editTabIncome">
+                            <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                            Income
+                        </button>
+                    </div>
+                    <div class="form-control">
+                        <label for="editText">Description</label>
+                        <input type="text" id="editText" placeholder="Enter description...">
+                    </div>
+                    <div class="form-control">
+                        <label for="editAmount">Amount</label>
+                        <input type="number" id="editAmount" placeholder="Enter amount..." min="0.01" step="0.01">
+                    </div>
+                    <div class="form-control">
+                        <label for="editDate">Date</label>
+                        <input type="date" id="editDate">
+                    </div>
+                    <button class="btn" id="save-edit-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="session.js"></script>
+    <script src="history.js"></script>
+</body>
+</html>

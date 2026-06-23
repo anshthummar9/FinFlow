@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinFlow - Personal Finance & Expense Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="landing-page">
+
+  <!-- Navigation Bar -->
+  <header class="landing-header">
+    <div class="nav-container">
+      <div class="logo">
+        <i data-lucide="wallet" class="logo-icon"></i>
+        <span>FinFlow</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="badge-pill">
+          <i data-lucide="sparkles" class="badge-icon"></i>
+          <span>Track Finance in Real-Time</span>
+        </div>
+        <h1>Take Control of Your Wealth with <span>FinFlow</span></h1>
+        <p>Smart tracking. Deep analytics. Effortless control. FinFlow simplifies personal finance so you can focus on building your savings rate and expanding your net cash flow.</p>
+        <div class="hero-actions">
+          <a href="register.html?ref=landing" class="btn btn-primary btn-lg" id="hero-primary-btn">
+            <i data-lucide="user-plus"></i>
+            <span>Start Tracking Free</span>
+          </a>
+          <a href="login.html?ref=landing" class="btn btn-secondary btn-lg" id="hero-secondary-btn">
+            <i data-lucide="log-in"></i>
+            <span>Log In Workspace</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <div class="features-container">
+      <div class="section-header">
+        <h2>Features Built for Financial Growth</h2>
+        <p>Everything you need to track, organize, and inspect your financial flows in a streamlined user workspace.</p>
+      </div>
+      <div class="features-grid">
+        
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="plus-circle" class="feature-icon text-primary"></i>
+          </div>
+          <h3>Real-time Transaction Logging</h3>
+          <p>Instantly log incomes and expenses with optional descriptions. Get immediate updates on balance metrics and cash flows.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="bar-chart-2" class="feature-icon text-success"></i>
+          </div>
+          <h3>Advanced Analytics Portal</h3>
+          <p>Examine dual-graph dashboards mapping doughnut expense breakdowns and trend area lines of savings rates simultaneously.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="shield-alert" class="feature-icon text-danger"></i>
+          </div>
+          <h3>Session Timeout Safeguard</h3>
+          <p>An automated 15-minute inactivity session lock clears local keys and redirects tabs to defend your financial data from prying eyes.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="sliders" class="feature-icon text-warning"></i>
+          </div>
+          <h3>Flexible Filters Engine</h3>
+          <p>Sort by size or date, search descriptors, and filter custom ranges to find precisely what transaction history matches your criteria.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works-section" id="how-it-works">
+    <div class="how-it-works-container">
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p>Getting your budget in shape takes less than two minutes. Let's see how simple it is.</p>
+      </div>
+      <div class="steps-timeline">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h4>Register Account</h4>
+          <p>Create a secure account on the platform with just a username and password.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h4>Log Income & Expenses</h4>
+          <p>Add your receipts and cash inflows on the fly. Categorize with optional descriptions.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h4>Optimize Financial Flow</h4>
+          <p>Observe detailed visualizations of your monthly budget curves and increase your savings rate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner Section -->
+  <section class="cta-banner-section">
+    <div class="cta-banner-container">
+      <h2>Master Your Cash Flow Starting Today</h2>
+      <p>Join thousands of users organizing their transaction histories and optimizing savings with FinFlow's sleek, responsive financial dashboard.</p>
+      <a href="register.html?ref=landing" class="btn btn-primary btn-lg" id="footer-cta-btn">
+        <span>Get Started For Free</span>
+        <i data-lucide="arrow-right"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="landing-footer" style="--footer-max-width: 1200px;">
+    <div class="footer-container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 FinFlow Expense Tracker. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Session Check and Dynamic Routing -->
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Check if the user is already authenticated
+    const user = localStorage.getItem("user");
+    if (user) {
+      window.location.href = "expense_tracker.html";
+    }
+  </script>
+</body>
+</html>

@@ -11,6 +11,16 @@
 </head>
 
 <body>
+  <!-- Navigation Bar -->
+  <header class="landing-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo" style="text-decoration: none;">
+        <i data-lucide="wallet" class="logo-icon"></i>
+        <span>FinFlow</span>
+      </a>
+    </div>
+  </header>
+
   <div class="auth-page">
     <div class="auth-container">
       <div class="auth-header">
@@ -30,10 +40,19 @@
           <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
           Login
         </button>
-        <a href="register.html" class="auth-link">Don't have an account? Register</a>
+        <a href="register.html?ref=landing" class="auth-link">Don't have an account? Register</a>
       </form>
     </div>
   </div>
+
+  <!-- Footer Section -->
+  <footer class="landing-footer" style="--footer-max-width: 400px;">
+    <div class="footer-container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 FinFlow Expense Tracker. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
   <div class="toast-container" id="toast-container"></div>
 
@@ -67,8 +86,20 @@
     }
 
     const storedUser = localStorage.getItem("user");
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    const timeout = urlParams.get('timeout');
+
     if (storedUser) {
       window.location.href = "expense_tracker.html";
+    } else if (ref !== 'landing' && timeout !== 'true') {
+      window.location.href = "index.html";
+    }
+
+    if (timeout === 'true') {
+      // Clean up the URL parameter immediately to avoid duplicate toasts on refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showToast('Your session has expired due to inactivity. Please login again.', 'info');
     }
 
     document.getElementById('login-form').addEventListener('submit', async (event) => {
@@ -100,6 +131,7 @@
 
         const data = await response.json();
         localStorage.setItem("user", data.username);
+        localStorage.setItem("lastActivity", Date.now().toString());
         showToast('Login successful! Redirecting...', 'success');
         setTimeout(() => {
           window.location.href = "expense_tracker.html";

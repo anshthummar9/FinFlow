@@ -50,4 +50,10 @@ public class TransactionController {
     public Transaction restoreTransaction(@PathVariable String username, @PathVariable Long id) {
         return transactionService.restoreTransaction(id, username);
     }
+
+    // Update specific transaction by id and username
+    @PutMapping("/{username}/{id}")
+    public Transaction updateTransaction(@PathVariable String username, @PathVariable Long id, @RequestBody Transaction transactionDetails) {
+        return transactionService.updateTransaction(id, username, transactionDetails);
+    }
 }
