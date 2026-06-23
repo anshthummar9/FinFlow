@@ -21,15 +21,33 @@ public class TransactionController {
         return transactionService.addTransaction(transaction, username);
     }
 
-    // Get all transactions for given username
+    // Get all active transactions for given username
     @GetMapping("/{username}")
     public List<Transaction> getAllTransactions(@PathVariable String username) {
         return transactionService.getAllTransactions(username);
     }
 
-    // Delete specific transaction by id and username
+    // Get all deleted transactions for given username
+    @GetMapping("/{username}/deleted")
+    public List<Transaction> getDeletedTransactions(@PathVariable String username) {
+        return transactionService.getDeletedTransactions(username);
+    }
+
+    // Delete (soft-delete) specific transaction by id and username
     @DeleteMapping("/{username}/{id}")
     public void deleteTransaction(@PathVariable String username, @PathVariable Long id) {
         transactionService.deleteTransaction(id, username);
+    }
+
+    // Permanently delete specific transaction by id and username
+    @DeleteMapping("/{username}/{id}/permanent")
+    public void permanentlyDeleteTransaction(@PathVariable String username, @PathVariable Long id) {
+        transactionService.permanentlyDeleteTransaction(id, username);
+    }
+
+    // Restore specific transaction by id and username
+    @PutMapping("/{username}/{id}/restore")
+    public Transaction restoreTransaction(@PathVariable String username, @PathVariable Long id) {
+        return transactionService.restoreTransaction(id, username);
     }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    List<Transaction> findByUserUsername(String username);
+    List<Transaction> findByUserUsernameAndDeletedFalse(String username);
+    List<Transaction> findByUserUsernameAndDeletedTrue(String username);
     Transaction findByIdAndUserUsername(Long id, String username);
 }

@@ -26,4 +26,5 @@ public class Transaction {
     @JsonBackReference
     private User user;
 
+    private boolean deleted = false;
 }

@@ -33,14 +33,41 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<Transaction> getAllTransactions(String username) {
-        return transactionRepository.findByUserUsername(username);
+        return transactionRepository.findByUserUsernameAndDeletedFalse(username);
+    }
+
+    @Override
+    public List<Transaction> getDeletedTransactions(String username) {
+        return transactionRepository.findByUserUsernameAndDeletedTrue(username);
     }
 
     @Override
     public void deleteTransaction(Long id, String username) {
         Transaction transaction = transactionRepository.findByIdAndUserUsername(id, username);
         if (transaction != null) {
+            transaction.setDeleted(true);
+            transactionRepository.save(transaction);
+        } else {
+            throw new RuntimeException("Transaction not found or does not belong to the user: " + username);
+        }
+    }
+
+    @Override
+    public void permanentlyDeleteTransaction(Long id, String username) {
+        Transaction transaction = transactionRepository.findByIdAndUserUsername(id, username);
+        if (transaction != null) {
             transactionRepository.delete(transaction);
+        } else {
+            throw new RuntimeException("Transaction not found or does not belong to the user: " + username);
+        }
+    }
+
+    @Override
+    public Transaction restoreTransaction(Long id, String username) {
+        Transaction transaction = transactionRepository.findByIdAndUserUsername(id, username);
+        if (transaction != null) {
+            transaction.setDeleted(false);
+            return transactionRepository.save(transaction);
         } else {
             throw new RuntimeException("Transaction not found or does not belong to the user: " + username);
         }

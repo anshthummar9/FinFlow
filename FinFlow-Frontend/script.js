@@ -13,6 +13,14 @@ const filterAll = document.getElementById("filterAll");
 const filterIncome = document.getElementById("filterIncome");
 const filterExpense = document.getElementById("filterExpense");
 
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsDropdown = document.getElementById("settingsDropdown");
+const openTrashBtn = document.getElementById("openTrashBtn");
+const trashModal = document.getElementById("trashModal");
+const closeTrashModalBtn = document.getElementById("closeTrashModalBtn");
+const modalSearchInput = document.getElementById("modalSearchInput");
+const modalList = document.getElementById("modalList");
+
 const tabExpense = document.getElementById("tabExpense");
 const tabIncome = document.getElementById("tabIncome");
 
@@ -27,8 +35,10 @@ logoutBtn.addEventListener("click", () => {
 });
 
 let transactions = [];
+let deletedTransactions = [];
 let activeTransactionType = 'expense'; // default tab
 let searchQuery = '';
+let modalSearchQuery = '';
 let filterType = 'all'; // 'all', 'income', 'expense'
 let analyticsChart = null;
 
@@ -183,7 +193,7 @@ function addTransactionDOM(transaction) {
     </div>
     <div class="transaction-item-right">
       <span class="transaction-amount">${symbol}₹${displayAmount}</span>
-      <button class="delete-action-btn" onclick="removeTransaction(${transaction.id})">
+      <button class="delete-action-btn" onclick="removeTransaction(${transaction.id})" title="Delete">
         <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
       </button>
     </div>
@@ -191,7 +201,42 @@ function addTransactionDOM(transaction) {
   list.appendChild(div);
 }
 
-// Delete transaction
+// Generate deleted transaction item element in modal
+function addDeletedTransactionDOM(transaction) {
+  const div = document.createElement("div");
+  const isIncome = transaction.amount >= 0;
+  div.className = `transaction-item ${isIncome ? "income" : "expense"} deleted-item`;
+  
+  const iconName = isIncome ? "arrow-up-right" : "arrow-down-left";
+  const symbol = isIncome ? "+" : "-";
+  const displayAmount = Math.abs(transaction.amount).toFixed(2);
+  
+  div.innerHTML = `
+    <div class="transaction-item-left">
+      <div class="transaction-type-icon">
+        <i data-lucide="${iconName}" style="width: 18px; height: 18px;"></i>
+      </div>
+      <div class="transaction-details">
+        <span class="transaction-desc">${transaction.text}</span>
+        <span class="transaction-date">${transaction.date}</span>
+      </div>
+    </div>
+    <div class="transaction-item-right">
+      <span class="transaction-amount">${symbol}₹${displayAmount}</span>
+      <div class="trash-actions">
+        <button class="restore-action-btn" onclick="restoreTransaction(${transaction.id})" title="Restore">
+          <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+        </button>
+        <button class="delete-action-btn" onclick="permanentlyDeleteTransaction(${transaction.id})" title="Delete Permanently">
+          <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+        </button>
+      </div>
+    </div>
+  `;
+  modalList.appendChild(div);
+}
+
+// Delete transaction (soft delete)
 function removeTransaction(id) {
   fetch(`http://localhost:8080/ExpTrack/transactions/${username}/${id}`, {
     method: "DELETE",
@@ -200,7 +245,7 @@ function removeTransaction(id) {
       if (!res.ok) throw new Error("Delete failed");
       transactions = transactions.filter((t) => t.id !== id);
       updateUI();
-      showToast("Transaction deleted.", "success");
+      showToast("Transaction moved to Trash.", "success");
     })
     .catch((err) => {
       console.error("Delete failed", err);
@@ -208,14 +253,56 @@ function removeTransaction(id) {
     });
 }
 
-// Expose removeTransaction globally for onclick handler
+// Restore transaction
+function restoreTransaction(id) {
+  fetch(`http://localhost:8080/ExpTrack/transactions/${username}/${id}/restore`, {
+    method: "PUT",
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Restore failed");
+      deletedTransactions = deletedTransactions.filter((t) => t.id !== id);
+      updateModalUI();
+      fetchActiveTransactions().then(() => {
+        showToast("Transaction restored.", "success");
+      });
+    })
+    .catch((err) => {
+      console.error("Restore failed", err);
+      showToast("Could not restore transaction.", "error");
+    });
+}
+
+// Permanently delete transaction
+function permanentlyDeleteTransaction(id) {
+  if (!confirm("Are you sure you want to permanently delete this transaction? This action cannot be undone.")) {
+    return;
+  }
+  
+  fetch(`http://localhost:8080/ExpTrack/transactions/${username}/${id}/permanent`, {
+    method: "DELETE",
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Permanent delete failed");
+      deletedTransactions = deletedTransactions.filter((t) => t.id !== id);
+      updateModalUI();
+      showToast("Transaction permanently deleted.", "success");
+    })
+    .catch((err) => {
+      console.error("Permanent delete failed", err);
+      showToast("Could not permanently delete transaction.", "error");
+    });
+}
+
+// Expose functions globally for onclick handlers
 window.removeTransaction = removeTransaction;
+window.restoreTransaction = restoreTransaction;
+window.permanentlyDeleteTransaction = permanentlyDeleteTransaction;
 
 // Update the list and values
 function updateUI() {
   list.innerHTML = "";
   
-  // Apply search query and status filter
+  // Apply search query and status filter to active transactions
   const filtered = transactions.filter(t => {
     const matchesSearch = t.text.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = 
@@ -242,6 +329,31 @@ function updateUI() {
   
   updateValues();
   updateChart();
+}
+
+// Update the deleted list in modal
+function updateModalUI() {
+  modalList.innerHTML = "";
+  
+  // Apply search query to deleted transactions
+  const filtered = deletedTransactions.filter(t => {
+    return t.text.toLowerCase().includes(modalSearchQuery.toLowerCase());
+  });
+
+  if (filtered.length === 0) {
+    modalList.innerHTML = `
+      <div class="empty-state">
+        <i data-lucide="trash-2"></i>
+        <span>No deleted transactions found</span>
+      </div>
+    `;
+  } else {
+    filtered.forEach(addDeletedTransactionDOM);
+  }
+  
+  if (window.lucide) {
+    lucide.createIcons();
+  }
 }
 
 // Add transaction form submit
@@ -308,17 +420,8 @@ if (filterAll) filterAll.addEventListener("click", () => setFilter('all', filter
 if (filterIncome) filterIncome.addEventListener("click", () => setFilter('income', filterIncome));
 if (filterExpense) filterExpense.addEventListener("click", () => setFilter('expense', filterExpense));
 
-// Fetch and load initial data
-function init() {
-  if (userNameSpan && username) {
-    userNameSpan.textContent = username;
-  }
-  
-  if (window.lucide) {
-    lucide.createIcons();
-  }
-  
-  fetch(`http://localhost:8080/ExpTrack/transactions/${username}`)
+function fetchActiveTransactions() {
+  return fetch(`http://localhost:8080/ExpTrack/transactions/${username}`)
     .then((res) => {
       if (!res.ok) throw new Error("Fetch failed");
       return res.json();
@@ -330,8 +433,77 @@ function init() {
     .catch((err) => {
       console.error("Fetch failed", err);
       showToast("Could not load transaction history.", "error");
-      updateUI(); // load placeholders
+      updateUI();
     });
+}
+
+function fetchDeletedTransactions() {
+  return fetch(`http://localhost:8080/ExpTrack/transactions/${username}/deleted`)
+    .then((res) => {
+      if (!res.ok) throw new Error("Fetch failed");
+      return res.json();
+    })
+    .then((data) => {
+      deletedTransactions = data;
+      updateModalUI();
+    })
+    .catch((err) => {
+      console.error("Fetch failed", err);
+      showToast("Could not load deleted transactions.", "error");
+      updateModalUI();
+    });
+}
+
+// Fetch and load initial data
+function init() {
+  if (userNameSpan && username) {
+    userNameSpan.textContent = username;
+  }
+  
+  // Settings Dropdown Event Listeners
+  if (settingsBtn && settingsDropdown) {
+    settingsBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      settingsDropdown.classList.toggle("show");
+    });
+    
+    document.addEventListener("click", () => {
+      settingsDropdown.classList.remove("show");
+    });
+  }
+
+  // Modal Event Listeners
+  if (openTrashBtn && trashModal && closeTrashModalBtn) {
+    openTrashBtn.addEventListener("click", () => {
+      trashModal.classList.add("show");
+      settingsDropdown.classList.remove("show");
+      fetchDeletedTransactions();
+    });
+    
+    closeTrashModalBtn.addEventListener("click", () => {
+      trashModal.classList.remove("show");
+    });
+    
+    window.addEventListener("click", (e) => {
+      if (e.target === trashModal) {
+        trashModal.classList.remove("show");
+      }
+    });
+  }
+
+  // Modal Search
+  if (modalSearchInput) {
+    modalSearchInput.addEventListener("input", (e) => {
+      modalSearchQuery = e.target.value;
+      updateModalUI();
+    });
+  }
+  
+  if (window.lucide) {
+    lucide.createIcons();
+  }
+  
+  fetchActiveTransactions();
 }
 
 init();
