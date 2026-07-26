@@ -2,9 +2,8 @@
 
 [![Java](https://img.shields.io/badge/Language-Java-orange)](https://www.java.com/)
 [![Spring Boot](https://img.shields.io/badge/Framework-Spring%20Boot-brightgreen)](https://spring.io/projects/spring-boot)
-[![JSP](https://img.shields.io/badge/View%20Engine-JSP-blue)](https://jakarta.ee/specifications/pages/)
+[![JSP](https://img.shields.io/badge/View%20Engine-JSP-red)](https://jakarta.ee/specifications/pages/)
 [![MySQL](https://img.shields.io/badge/Database-MySQL-blue)](https://www.mysql.com/)
-[![License](https://img.shields.io/badge/License-MIT-green)](#)
 
 A modern **full-stack personal finance and budget management application** built with **Spring Boot 3**, **JSP (Java Server Pages)**, **Spring Data JPA**, **MySQL**, and **Vanilla JavaScript/CSS**.
 
