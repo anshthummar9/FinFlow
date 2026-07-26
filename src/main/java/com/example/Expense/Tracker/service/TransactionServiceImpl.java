@@ -82,6 +82,12 @@ public class TransactionServiceImpl implements TransactionService {
             if (transactionDetails.getDate() != null) {
                 transaction.setDate(transactionDetails.getDate());
             }
+            if (transactionDetails.getCategory() != null) {
+                transaction.setCategory(transactionDetails.getCategory());
+            }
+            if (transactionDetails.getAccount() != null) {
+                transaction.setAccount(transactionDetails.getAccount());
+            }
             return transactionRepository.save(transaction);
         } else {
             throw new RuntimeException("Transaction not found or does not belong to the user: " + username);

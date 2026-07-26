@@ -27,4 +27,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Transaction> transactions = new ArrayList<>();
+
+    public User orElseThrow(Object o) {
+        return null;
+    }
 }

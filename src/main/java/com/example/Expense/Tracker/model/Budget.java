@@ -2,33 +2,31 @@ package com.example.Expense.Tracker.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.time.LocalDate;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "transaction")
-public class Transaction {
+@Table(name = "budget")
+@AllArgsConstructor
+@NoArgsConstructor
+public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String text;
+    private String category;
 
     private double amount;
 
-    private LocalDate date;
+    private int month;   // 1–12
 
-    private String category;
-
-    private String account;
+    private int year;    // e.g. 2026
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
-
-    private boolean deleted = false;
 }
